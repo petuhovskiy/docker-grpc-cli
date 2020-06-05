@@ -29,13 +29,11 @@ RUN mkdir -p /grpc/cmake/build \
     
 RUN cd /grpc/cmake/build && make -j4 grpc_cli
 
-RUN pwd
+RUN git clone https://github.com/protocolbuffers/protobuf
 
-RUN ls -lah
+# RUN ls /protobuf/src/google/protobuf
 
-RUN ls -lah /grpc
 
-RUN ls -lah /grpc/cmake/build
 
 # RUN cd /grpc/third_party/gflags \
 #     && mkdir build && cd build \
@@ -49,6 +47,11 @@ RUN ls -lah /grpc/cmake/build
 FROM debian:buster
 COPY --from=builder /grpc/cmake/build/grpc_cli /grpc_cli
 COPY --from=builder /grpc/etc/roots.pem /usr/local/share/grpc/roots.pem
+
+RUN mkdir -p /usr/local/include/google/protobuf
+COPY --from=builder /protobuf/src/google/protobuf /usr/local/include/google/protobuf
+
+# RUN ls /usr/local/include/google/protobuf
 
 ENTRYPOINT ["/grpc_cli"]
 CMD ["help"]
